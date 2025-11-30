@@ -8,6 +8,7 @@ const JobListing=() => {
   const{isSearched, searchFilter, setSearchFilter, jobs} = useContext(AppContext)
 
   const[showFilter, setShowFilter] = useState(true);
+  const[currentPage , setCurrentPage] = useState(1);
 
 
 
@@ -87,11 +88,35 @@ const JobListing=() => {
           <h3 className='font-medium text-3xl py-2' id="job-list">Latest Jobs</h3>
           <p className='mb-8' >Get your desired job from top companies </p>
           <div className='grid gird-cols-1 sm:grid-col-2 xl:grid-cols-3 gap-4'>
-            {jobs.map((job,index)=>(
+            {jobs.slice((currentPage-1)*6,currentPage*6).map((job,index)=>(
               <JobCard key={index} job={job} />
             ))}
 
           </div>
+
+          {/*Pagination */}
+
+          {jobs.length >0 &&(
+            <div className='flex items-center justify-center space-x-2 mt-10'>
+              <a href='job_list'>
+                <img onClick={()=>setCurrentPage(Math.max(currentPage-1,1))} src={assets.left_arrow_icon}/>
+              </a>
+              {
+                Array.from({length:Math.ceil(jobs.length/6)}).map((_,index)=>(
+                  <a href='#job-list'>
+                    <button onClick={()=> setCurrentPage(index+1)} className={`w-10 h-10 flex items-center justify-center border border-gray-300 rounded 
+                    ${currentPage === index+1 
+                      ?'bg-blue-100 text-blue-500'
+                      : 'text-gray-500' }
+                    `}>{index + 1}</button>
+                  </a>
+                ))
+              }
+              <a href='job_list'>
+                <img onClick={()=>setCurrentPage(Math.min(currentPage+1,Math.ceil(jobs.length/6)))} src={assets.right_arrow_icon}/>
+              </a>
+            </div>
+          ) }
         </section>
   
     </div>
