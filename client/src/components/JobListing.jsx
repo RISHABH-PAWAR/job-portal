@@ -9,6 +9,21 @@ const JobListing=() => {
 
   const[showFilter, setShowFilter] = useState(true);
   const[currentPage , setCurrentPage] = useState(1);
+  const[selectedcategories,setSelectedCategories] = useState([])
+  const[selectedLocation,setSelectedLocations] = useState([])
+  const [filteredJobs,setFilteredJobs] = useState(jobs)
+
+  const handleCategoryChanage = (category) =>{
+    setSelectedCategories(
+      prev => prev.includes(category) ? prev.filter(c= c!== category) : [...prev,category] 
+    )
+  }
+
+  const handleLocationChanage = (location) =>{
+    setSelectedLocations(
+      prev => prev.includes(location) ? prev.filter(c= c!== location) : [...prev,location] 
+    )
+  }
 
 
 
@@ -57,7 +72,12 @@ const JobListing=() => {
             {
               JobCategories.map((catagory , index)=>(
                 <li className="flex gap-3 items-center" key = {index}>
-                  <input className='scale-125 ' type='checkbox' name='' id=''/>
+                  <input  
+                  className='scale-125 ' 
+                  type='checkbox' name='' id=''
+                  onChange={()=> handleCategoryChanage(catagory)}
+                  checked = {selectedcategories.includes(catagory)}
+                  />
                   {catagory}
                 </li>
               ))
@@ -73,7 +93,10 @@ const JobListing=() => {
             {
               JobLocations.map((location , index)=>(
                 <li className="flex gap-3 items-center" key = {index}>
-                  <input className='scale-125 ' type='checkbox' name='' id=''/>
+                  <input className='scale-125 ' type='checkbox'
+                  onChange={()=> handleLocationChanage(location)}
+                  checked = {selectedLocation.includes(location)}
+                  />
                   {location}
                 </li>
               ))
