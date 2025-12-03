@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { AppContext } from '../context/AppContext'
 import { assets, JobCategories, JobLocations } from '../assets/assets'
 import JobCard from './JobCard'
@@ -9,13 +9,13 @@ const JobListing=() => {
 
   const[showFilter, setShowFilter] = useState(true);
   const[currentPage , setCurrentPage] = useState(1);
-  const[selectedcategories,setSelectedCategories] = useState([])
-  const[selectedLocation,setSelectedLocations] = useState([])
+  const[selectedCategories,setSelectedCategories] = useState([])
+  const[selectedLocations,setSelectedLocations] = useState([])
   const [filteredJobs,setFilteredJobs] = useState(jobs)
 
   const handleCategoryChanage = (category) =>{
     setSelectedCategories(
-      prev => prev.includes(category) ? prev.filter(c= c!== category) : [...prev,category] 
+      (prev) => prev.includes(category) ? prev.filter((c)=> c!== category) : [...prev,category] 
     )
   }
 
@@ -24,6 +24,22 @@ const JobListing=() => {
       prev => prev.includes(location) ? prev.filter(c= c!== location) : [...prev,location] 
     )
   }
+
+  useEffect(()=>{
+    const matchesCategory = job => selectedCategories.length === 0 || selectedCategories.includes(job.category)
+
+    const matchesLocation = job => selectedLocations.length === 0 || selectedLocations.includes(job.location)
+
+    const matchesTitle = job => searchFilter.title ==='' || job.title.toLowerCase().includes(searchFilter.title.toLowerCase())
+
+    const matchesSearchLocation = job => searchFilter.location === "" || job.location.toLowerCase().includes(searchFilter.location.toLowerCase())
+
+    const newFilteredJobs = jobs.slice().reverse().filter(
+      job=> matchesCategory(job) && matchesLocation(job) && matchesTitle(job) && matchesSearchLocation(job)
+    )
+    setFilteredJobs(newFilteredJobs)
+    setCurrentPage(1)
+  },[jobs,selectedLocations,selectedCategories,searchFilter])
 
 
 
@@ -76,7 +92,7 @@ const JobListing=() => {
                   className='scale-125 ' 
                   type='checkbox' name='' id=''
                   onChange={()=> handleCategoryChanage(catagory)}
-                  checked = {selectedcategories.includes(catagory)}
+                  checked = {selectedCategories.includes(catagory)}
                   />
                   {catagory}
                 </li>
@@ -95,7 +111,7 @@ const JobListing=() => {
                 <li className="flex gap-3 items-center" key = {index}>
                   <input className='scale-125 ' type='checkbox'
                   onChange={()=> handleLocationChanage(location)}
-                  checked = {selectedLocation.includes(location)}
+                  checked = {selectedLocations.includes(location)}
                   />
                   {location}
                 </li>
@@ -111,7 +127,7 @@ const JobListing=() => {
           <h3 className='font-medium text-3xl py-2' id="job-list">Latest Jobs</h3>
           <p className='mb-8' >Get your desired job from top companies </p>
           <div className='grid gird-cols-1 sm:grid-col-2 xl:grid-cols-3 gap-4'>
-            {jobs.slice((currentPage-1)*6,currentPage*6).map((job,index)=>(
+            {filteredJobs.slice((currentPage-1)*6,currentPage*6).map((job,index)=>(
               <JobCard key={index} job={job} />
             ))}
 
